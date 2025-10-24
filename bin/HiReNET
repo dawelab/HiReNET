@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# --- find project root ---
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+SCRIPTS="${ROOT}/scripts"
+export HIRENET_ROOT="${ROOT}"
+
+usage() {
+  echo "HiReNET — run HOR and monomer analysis pipeline"
+  echo
+  echo "Usage:"
+  echo "  HiReNET <command> [args...]"
+  echo
+  echo "Available commands:"
+  for f in $(ls -1 "${SCRIPTS}"/[0-9][0-9]_*.sh 2>/dev/null | sort); do
+    b=$(basename "$f")
+    printf "  %s\n" "$(sed -E 's/^[0-9]+_//' <<< "${b%.sh}")"
+  done
+  echo
+  echo "Example:"
+  echo "  HiReNET getphmm -i input.fasta -o out -p tag"
+}
+
+cmd="${1:-}"
+[[ -z "$cmd" || "$cmd" == "-h" || "$cmd" == "--help" ]] && { usage; exit 0; }
+shift || true
+
+# find matching bash script
+file_bash=$(ls "${SCRIPTS}"/[0-9][0-9]_"${cmd}".sh 2>/dev/null | head -n1 || true)
+if [[ -n "$file_bash" ]]; then
+  exec bash "$file_bash" "$@"
+fi
+
+echo "❌ Unknown command: $cmd"
+echo
+usage
+exit 1
