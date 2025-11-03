@@ -5,7 +5,7 @@ HiReNET is a graph-based pipeline for detecting and analyzing higher-order repea
 ## Installation:
 <pre> 
 # Clone the Repository
-git clone https://github.com/<yourname>/HiReNET.git
+git clone https://github.com/dawelab/HiReNET.git
 cd HiReNET
 
 # Build and install
