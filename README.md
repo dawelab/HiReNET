@@ -26,14 +26,20 @@ HiReNET relies on common bioinformatics tools. Please make sure these are instal
 - SeqKit
 - BEDTools
 - bioawk
+- MAFFT
 
 R with packages:
 - dplyr
+- tidyr
 - stringr
-- reshape2
-- igraph
+- purrr
+- rlang
+- data.table
 - ggplot2
 - cowplot
+- igraph
+- caret
+- readr
 
 ## Usage:
 ### Step 1: Prepare profile hidden Markov models (phmm’s) for repeat monomer identification. 
