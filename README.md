@@ -43,6 +43,25 @@ R with packages:
 - caret
 - readr
 
+## Quick Satrt:
+<pre>
+# Run for mutiple chromosomes or sequences
+HiReNET runALL \
+  --chr "chr1,chr2,chr3,chr4,chr5" \
+  --prefix AthCEN178 \
+  --consensus AthCEN178_consensus.fasta \
+  --seq Ey15.fasta \
+  --variant AthCEN178_consensus_variant.fasta
+	
+# Run for a single chromosome or sequence
+HiReNET runALL \
+  --chr "chr1" \
+  --prefix AthCEN178 \
+  --consensus AthCEN178_consensus.fasta \
+  --seq Ey15.fasta \
+  --variant AthCEN178_consensus_variant.fasta
+	
+</pre>
 ## Usage:
 ### Part 1: Prepare profile hidden Markov models (phmm’s) for repeat monomer identification. 
 Before starting this pipeline, whole-genome sequencing short reads should be analyzed with RepeatExplorer TAREAN to generate consensus repeats and repeat variants for each repeat type. RepeatExplorer is available through the public Galaxy server at https://repeatexplorer-elixir.cerit-sc.cz/. Using the outputs from RepeatExplorer TAREAN, you can then select the repeat of interest and generate profile hidden Markov models (pHMMs). 
@@ -51,8 +70,8 @@ Before starting this pipeline, whole-genome sequencing short reads should be ana
 
 <pre>
 Usage:
-	
-HiReNET getphmm -i test_con_variant.fasta -o phmm -p test
+# Step 1 — Build profile HMM 
+HiReNET getphmm -i AthCEN178_consensus_variant.fasta -o phmm -p AthCEN178
 </pre>
 
 ### Part 2: Identify repeat monomers and arrange monomers in the customized bins.
@@ -63,18 +82,25 @@ Repeat monomers can be identified using profile hidden Markov models (pHMMs) and
 <pre>
 Usage:
 	
-HiReNET arrayfind -g genome.fasta -c consensus.fasta -o arrayout -p test
+# Step 2 — Find repeat arrays
+HiReNET arrayfind -g Ey15.fasta -c AthCEN178_consensus.fasta -o AthCEN178_arrayout -p AthCEN178
+# Step 3 — Detect monomers
 HiReNET monomerfind \
-	--arrays-dir arrayout \
-	--outdir monomerout \
-	--prefix test --hmm phmm/test.hmm \
-	--chr "chr1,chr2"
+  --arrays-dir AthCEN178_arrayout \
+  --chrom-dir  AthCEN178_arrayout/split_seq \
+  --outdir     AthCEN178_monomerout \
+  --prefix     AthCEN178 \
+  --hmm        AthCEN178_phmm/AthCEN178.hmm \
+  --chr "chr1,chr2,chr3,chr4,chr5"
+# Step 4 — Arrange monomers into bins
 HiReNET arrangemonomer \
-	--monomer-dir monomerout/test_monomers \
-	--outdir arrangemonomer_10kb \
-	--prefix test \
-	--bin 10000 \
-	--chr "chr1,chr2"
+  --arrays-dir AthCEN178_arrayout \
+  --genomic-bed-dir AthCEN178_monomerout \
+  --monomer-dir AthCEN178_monomerout/AthCEN178_monomers \
+  --outdir AthCEN178_arrangemonomer_10kb \
+  --prefix AthCEN178 \
+  --bin 10000 \
+  --chr "chr1,chr2,chr3,chr4,chr5"
 </pre>
 
 ### Part 3: Classify repeat bins into three classes (Order, HOR, Disorder) using the pre-trained LDA model.
@@ -85,27 +111,26 @@ Within each bin, monomers are compared in an all-to-all manner using BLAT. The r
 <pre>
 Usage: 
 	
+# Step 5 — Compare monomers (self + consensus)
 HiReNET comparemonomer \
-	--bins-dir arrangemonomer_10kb/test_bin_monomers \
-	--outdir comparemonomers_wcon \
-	--consensus consensus.fasta 
-	
-HiReNET comparemonomer \
-	--bins-dir arrangemonomer_10kb/test_bin_monomers \
-	--outdir comparemonomers2_ncon
+  --bins-dir AthCEN178_arrangemonomer_10kb/AthCEN178_bin_monomers \
+  --outdir AthCEN178_comparemonomers \
+  --consensus AthCEN178_consensus.fasta
+
+# Step 6 — Predict HOR classes
+# R packages should be installed.
+HiReNET classprediction \
+  --blatsub AthCEN178_comparemonomers/blat_output_sub \
+  --outdir AthCEN178_classpred_out \
+  --prefix AthCEN178 \
+  --bin 10000 \
+  --plot
 
 HiReNET classprediction \
-	--blatsub comparemonomers_wcon/blat_output_sub \
-	--outdir classpred_out \
-	--prefix test \
-	--bin 10000
-	
-HiReNET classprediction \
-	--blatsub comparemonomers_wcon/blat_output_sub \
-	--outdir classpred_out2 \
-	--prefix test \
-	--bin 10000 \
-	--plot
+  --blatsub AthCEN178_comparemonomers/blat_output_sub \
+  --outdir AthCEN178_classpred_out2 \
+  --prefix AthCEN178 \
+  --bin 10000 
 </pre>
 
 
@@ -117,23 +142,24 @@ For each merged bin, monomers are compared in an all-to-all manner again and a n
 <pre>
 Usage:
 	
+# Step 7 — Rearrange monomers by class
 HiReNET rearrangemonomers \
-  --bins classpred_out/test_fin_bins_combined.txt \
+  --bins AthCEN178_classpred_out/AthCEN178_fin_bins_combined.txt \
   --class HOR \
-  --prefix test \
-  --monomer-dir monomerout/test_monomers \
-  --outdir rearrange_monomers_mergebin \
-  --chr "chr1,chr2"
-
+  --prefix AthCEN178 \
+  --monomer-dir AthCEN178_monomerout/AthCEN178_monomers \
+  --outdir AthCEN178_rearrange_monomers_mergebin \
+  --chr "chr1,chr2,chr3,chr4,chr5"
+# Step 8 — Compare rearranged monomers
 HiReNET comparemonomer \
-	--bins-dir rearrange_monomers_mergebin/re_arrange_monomers \
-	--outdir compare_rearrangemonomers
-	
+  --bins-dir AthCEN178_rearrange_monomers_mergebin/re_arrange_monomers \
+  --outdir AthCEN178_compare_rearrangemonomers
+# Step 9 — Build HOR network for meregd HOR bins
 HiReNET networkHOR \
-	--blatsub compare_rearrangemonomers/blat_output_sub \
-	--bins classpred_out/AthCEN178_fin_bins_combined.txt \
-	--coor rearrange_monomers_mergebin/test_monomer_bed_inbin.txt 
-	--outdir network_HOR_mergebin
+  --blatsub AthCEN178_compare_rearrangemonomers/blat_output_sub \
+  --bins AthCEN178_classpred_out/AthCEN178_fin_bins_combined.txt \
+  --coor AthCEN178_rearrange_monomers_mergebin/AthCEN178_monomer_bed_inbin.txt \
+  --outdir AthCEN178_network_HOR_mergebin
 
 </pre>
 
@@ -146,24 +172,55 @@ In each merged HOR bin, monomers with the same label are extracted to generate c
 <pre>
 Usage:
 	
+# Step 10 — Arrange HOR monomers for consensus 
 HiReNET arrangeHORmonomer \
-	--groupdir network_HOR_mergebin \
-	--monomer-dir monomerout/test_monomers \
-	--outdir network_mergebin_consensus
-	
+  --groupdir AthCEN178_network_HOR_mergebin \
+  --monomer-dir AthCEN178_monomerout/AthCEN178_monomers \
+  --outdir AthCEN178_network_mergebin_consensus
+
+# Step 11 — Build consensus HORs per chromosome
 HiReNET consensusHORmonomer \
-	--outdir network_mergebin_consensus \
-	--threads 4 \
-	--chroms "chr1,chr2"
-	
+  --outdir AthCEN178_network_mergebin_consensus \
+  --threads 10 \
+  --chroms "chr1"
+
 HiReNET compareConsensus \
-	--chr "chr1" --consensdir network_mergebin_consensus/all_recluster_consensus_monomer \
-	--outdir compare_consensusHOR_chr1
-	
-HiReNET sharedHOR\
-	--chr "chr1" --datadir compare_consensusHOR_chr1/blat_sub \
-	--outdir shared_out_chr1 \
-	--letter network_HOR_mergebin/mergebin_string_outputs  
+  --chr "chr1" \
+  --consensdir AthCEN178_network_mergebin_consensus/all_recluster_consensus_monomer \
+  --outdir AthCEN178_compare_consensusHOR_chr1
+
+HiReNET sharedHOR \
+  --chr "chr1" \
+  --datadir AthCEN178_compare_consensusHOR_chr1/blat_sub \
+  --outdir AthCEN178_shared_out_chr1 \
+  --letter AthCEN178_network_HOR_mergebin/mergebin_string_output
+  --plotv V2
+Step 11 — Use loop to build consensus HORs per chromosome 
+for chr in chr2 chr3 chr4 chr5; do
+  HiReNET consensusHORmonomer \
+    --outdir AthCEN178_network_mergebin_consensus \
+    --threads 10 \
+    --chroms "$chr"
+
+  HiReNET compareConsensus \
+    --chr "$chr" \
+    --consensdir AthCEN178_network_mergebin_consensus/all_recluster_consensus_monomer \
+    --outdir AthCEN178_compare_consensusHOR_${chr}
+
+  HiReNET sharedHOR \
+    --chr "$chr" \
+    --datadir AthCEN178_compare_consensusHOR_${chr}/blat_sub \
+    --outdir AthCEN178_shared_out_${chr} \
+    --letter AthCEN178_network_HOR_mergebin/mergebin_string_output
+    --plotv V2
+done
+
+# Step 12 (optional) — Multi-chromosome shared HOR 
+HiReNET sharedHOR_more \
+  --chr "chr1,chr2,chr3,chr4,chr5" \
+  --datadir AthCEN178_compare_consensusHOR_chr1/blat_sub \
+  --outdir AthCEN178_shared_out_all \
+  --letter AthCEN178_network_HOR_mergebin/mergebin_string_outputs
 </pre>
 
 
