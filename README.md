@@ -3,7 +3,19 @@
 ## Introduction:
 HiReNET is a graph-based pipeline for detecting and analyzing higher-order repeats (HORs) in genomic sequences. The pipeline has been applied to both Arabidopsis thaliana and maize, providing insights into centromeric and knob repeat structure.
 ## Installation:
-Not finished yet.
+# Clone the repo
+git clone https://github.com/<yourname>/HiReNET.git
+cd HiReNET
+
+# Build and install
+make install
+
+# Add to PATH
+echo 'export PATH="$HOME/HiReNET/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Verify
+HiReNET --help
 ## Dependencies:
 HiReNET relies on common bioinformatics tools. Please make sure these are installed and available in your PATH:
 - HMMER
