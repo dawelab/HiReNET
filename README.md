@@ -43,7 +43,7 @@ R with packages:
 - caret
 - readr
 
-## Quick Satrt:
+## Quick Start:
 <pre>
 # Run for mutiple chromosomes or sequences
 HiReNET runALL \
