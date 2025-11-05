@@ -24,8 +24,8 @@ HiReNET --help
 ## Dependencies:
 HiReNET relies on common bioinformatics tools. Please make sure these are installed and available in your PATH:
 <table>
-<tr><th>Bioinformatics Tools</th><th>R Packages</th></tr>
-<tr><td>
+<tr><th align="center">Bioinformatics Tools</th><th align="center">R Packages</th></tr>
+<tr><td align="center">
 
 - HMMER (3.4)  
 - BLAST+ (2.16.0)  
@@ -37,7 +37,7 @@ HiReNET relies on common bioinformatics tools. Please make sure these are instal
 - Clustal-Omega (1.2.4)  
 - EMBOSS (6.6.0)  
 
-</td><td>
+</td><td align="center">
 
 - dplyr  
 - tidyr  
@@ -51,7 +51,8 @@ HiReNET relies on common bioinformatics tools. Please make sure these are instal
 - caret  
 - readr  
 
-</td></tr> </table>
+</td></tr>
+</table>
 
 ## Quick Start:
 <pre>
