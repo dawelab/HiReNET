@@ -181,25 +181,79 @@ run_blat_self(){
   awk '$1 ~ /^[0-9]+$/ && NR>1 {print $1"\t"$10"\t"$11"\t"$14"\t"$15}' \
     "$out_blat" > "$out_sub"
 }
+#
+#if [[ ${#CHR_ARR[@]} -le 1 ]]; then
+#  # single-chromosome mode
+#  CHR="${CHR_ARR[0]}"
+#  echo "[*] Mode: single chromosome ($CHR)"
+#  for th in "${THR_ARR[@]}"; do
+#    th_out="${th/0./}"  # 0.91 -> 91
+#    src="$CONSENSDIR/${CHR}_clust.cons.${th_out}.fa"
+#    base="${CHR}.cons.${th_out}"
+#    run_blat_self "$src" "$base"
+#  done
+#else
+#  # merged-per-threshold mode
+#  echo "[*] Mode: merged per-threshold (>=2 chromosomes)"
+#  for th in "${THR_ARR[@]}"; do
+#    th_out="${th/0./}"
+#    src="$CONSENSDIR/clust.cons.${th_out}.fa"
+#    base="merged.cons.${th_out}"
+#    run_blat_self "$src" "$base"
+#  done
+#fi
 
 if [[ ${#CHR_ARR[@]} -le 1 ]]; then
-  # single-chromosome mode
+  # ---------------- Single-chromosome mode ----------------
   CHR="${CHR_ARR[0]}"
   echo "[*] Mode: single chromosome ($CHR)"
   for th in "${THR_ARR[@]}"; do
     th_out="${th/0./}"  # 0.91 -> 91
     src="$CONSENSDIR/${CHR}_clust.cons.${th_out}.fa"
     base="${CHR}.cons.${th_out}"
+    [[ -s "$src" ]] || { echo "WARN: missing $src — skipping"; continue; }
     run_blat_self "$src" "$base"
   done
+
 else
-  # merged-per-threshold mode
-  echo "[*] Mode: merged per-threshold (>=2 chromosomes)"
+  # -------------- Filtered merged-per-threshold mode --------------
+  # Build per-threshold merged files that include ONLY the requested chromosomes
+  echo "[*] Mode: merged per-threshold (filtered to requested chromosomes: ${CHR_ARR[*]})"
+
+  # Create a work subdir so we don't clobber the global clust.cons.*.fa
+  FILTERED_MERGE_DIR="$CONSENSDIR/filtered_merged"
+  mkdir -p "$FILTERED_MERGE_DIR"
+
+  # Clean up whitespace in CHR_ARR items
+  CLEAN_CHR_ARR=()
+  for c in "${CHR_ARR[@]}"; do
+    CLEAN_CHR_ARR+=( "${c//[[:space:]]/}" )
+  done
+
   for th in "${THR_ARR[@]}"; do
-    th_out="${th/0./}"
-    src="$CONSENSDIR/clust.cons.${th_out}.fa"
+    th_out="${th/0./}"  # 0.91 -> 91
+    merged="$FILTERED_MERGE_DIR/merged_${th_out}.fa"
+    : > "$merged"
+
+    # Concatenate only the selected chromosomes for this threshold
+    have_any=0
+    for chr in "${CLEAN_CHR_ARR[@]}"; do
+      part="$CONSENSDIR/${chr}_clust.cons.${th_out}.fa"
+      if [[ -s "$part" ]]; then
+        cat "$part" >> "$merged"
+        have_any=1
+      else
+        echo "WARN: missing $part — skipping"
+      fi
+    done
+
+    if [[ $have_any -eq 0 ]]; then
+      echo "WARN: no sequences found for threshold ${th} among requested chromosomes; skipping BLAT for this threshold."
+      continue
+    fi
+
     base="merged.cons.${th_out}"
-    run_blat_self "$src" "$base"
+    run_blat_self "$merged" "$base"
   done
 fi
 

@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Define main folders
+# Define main folders relative to this repo
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BIN="${ROOT}/bin"
 SCRIPTS="${ROOT}/scripts"
 RDIR="${ROOT}/R"
 
-# Create bin folder if missing
 mkdir -p "${BIN}"
 
-# ============= Create Dispatcher File =============
 cat > "${BIN}/HiReNET" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -68,6 +66,7 @@ EOF
 
 chmod +x "${BIN}/HiReNET"
 echo "Dispatcher created at ${BIN}/HiReNET"
-echo "You can now add it to PATH with:"
-echo "    echo 'export PATH=\"${BIN}:\$PATH\"' >> ~/.bashrc"
-echo "Then run: HiReNET --help"
+echo "Add to PATH with (bash):"
+echo "    echo 'export PATH=\"${BIN}:\$PATH\"' >> ~/.bashrc && source ~/.bashrc"
+echo "Or for zsh:"
+echo "    echo 'export PATH=\"${BIN}:\$PATH\"' >> ~/.zshrc && source ~/.zshrc"

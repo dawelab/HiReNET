@@ -152,7 +152,7 @@ echo "[*] default thr : $DEFAULT_THR"
 
 # ---------- Step 3: Network re-eval over merged bins ----------
 echo "[*] S3_network_summary_HOR_mergedbin.R ..."
-Rscript R/S3_network_summary_HOR_mergedbin.R \
+Rscript ${HIRENET_ROOT}/R/S3_network_summary_HOR_mergedbin.R \
   --input "$BLATSUB" \
   --bins "$BINS" \
   --outdir "$OUTDIR" \
@@ -167,7 +167,7 @@ S3_REEVAL="$OUTDIR/HOR_re-eval_clusters.txt"
 
 # ---------- Step 4: HOR patterns ----------
 echo "[*] S4_HORpatterns.R ..."
-Rscript R/S4_HORpatterns.R \
+Rscript ${HIRENET_ROOT}/R/S4_HORpatterns.R \
   --groups-dir "$OUTDIR/out_csv" \
   --reval "$S3_REEVAL" \
   --coor "$COOR" \
@@ -175,7 +175,7 @@ Rscript R/S4_HORpatterns.R \
 
 # ---------- Step 5: Monomer-size frequency plot ----------
 echo "[*] S5_Plot_HORmonomersize_freq.R ..."
-Rscript R/S5_Plot_HORmonomersize_freq.R \
+Rscript ${HIRENET_ROOT}/R/S5_Plot_HORmonomersize_freq.R \
   --hor "$OUTDIR/HOR_coor_bed.txt" \
   --outdir "$OUTDIR/fre_plots"
 

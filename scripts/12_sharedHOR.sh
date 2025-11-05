@@ -84,6 +84,7 @@ Optional arguments:
                         (default: <outdir>/mergebin_string_outputs)
   --chr <list>          Comma-separated chromosome list  
                         (e.g., "chr1" or "chr1,chr2")
+  --plotv <V>  Plot versions, V1, V2, V3
   -h, --help            Show this help message and exit
 
 ------------------------------------------------------------
@@ -112,6 +113,7 @@ DATADIR=""
 OUTDIR=""
 LETTERDIR=""
 CHR_FILTER=""
+PLOTV="" 
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -123,6 +125,8 @@ while [[ $# -gt 0 ]]; do
     --letter=*)  LETTERDIR="${1#*=}"; shift;;
     --chr)       CHR_FILTER="${2:-}"; shift 2;;
     --chr=*)     CHR_FILTER="${1#*=}"; shift;;
+    --plotv)        PLOTV="${2:-}"; shift 2;;
+    --plotv=*)      PLOTV="${1#*=}"; shift;;
     -h|--help)   usage; exit 0;;
     *)           die "Unknown argument: $1";;
   esac
@@ -191,17 +195,18 @@ echo
 
 # ---------- Run ----------
 echo "[*] S6_HOR_newpatt.R ..."
-Rscript R/S6_HOR_newpatt.R \
+Rscript ${HIRENET_ROOT}/R/S6_HOR_newpatt.R \
   --input "$DATADIR" \
   --outdir "$OUTDIR"
 
 echo "[*] S7_HOR_shared_pattern.R ..."
-Rscript R/S7_HOR_shared_pattern.R \
+Rscript ${HIRENET_ROOT}/R/S7_HOR_shared_pattern.R \
   --outdir "$OUTDIR" \
   --letters "$ACTIVE_LETTERDIR"
 
-echo "[*] S8_Shared_HOR_plot_cus.R ..."
-Rscript R/S8_Shared_HOR_plot_cus.R \
-  --outdir "$OUTDIR"
+echo "[*] S8_Shared_HOR_plot_cus2.R ..."
+Rscript "${HIRENET_ROOT}/R/S8_Shared_HOR_plot_cus2.R" \
+  --outdir "$OUTDIR" \
+  --plotv "$PLOTV"
 
 echo "[✓] Done. Outputs in: $OUTDIR"

@@ -168,13 +168,16 @@ if [[ "$MODE" == "blat" ]]; then
 fi
 
 # ---- R scripts live directly under R/ now ----
-S1_SCRIPT="R/S1_network_unmerge_bin_$([[ $PLOT -eq 1 ]] && echo plot || echo noplot).R"
-S2_SCRIPT="R/S2_smoothing_bin.R"
+S1_SCRIPT="${HIRENET_ROOT}/R/S1_network_unmerge_bin_$([[ $PLOT -eq 1 ]] && echo plot || echo noplot).R"
+S2_SCRIPT="${HIRENET_ROOT}/R/S2_smoothing_bin.R"
 
-# LDA model: prefer R/; fall back to scripts/ (matches your screenshots)
-if   [[ -f "R/lda_model.rds" ]];        then LDA_MODEL="R/lda_model.rds"
-elif [[ -f "scripts/lda_model.rds" ]];  then LDA_MODEL="scripts/lda_model.rds"
-else die "Missing LDA model: put lda_model.rds in R/ (preferred) or scripts/."
+# ---- LDA model path resolution ----
+if   [[ -f "${HIRENET_ROOT}/R/lda_model.rds" ]]; then
+  LDA_MODEL="${HIRENET_ROOT}/R/lda_model.rds"
+elif [[ -f "${HIRENET_ROOT}/scripts/lda_model.rds" ]]; then
+  LDA_MODEL="${HIRENET_ROOT}/scripts/lda_model.rds"
+else
+  die "Missing LDA model: expected in ${HIRENET_ROOT}/R or ${HIRENET_ROOT}/scripts."
 fi
 
 [[ -f "$S1_SCRIPT" ]] || die "Missing: $S1_SCRIPT"

@@ -170,17 +170,100 @@ echo "  MINSEQ      = $MINSEQ"
 echo "  THREADS     = $THREADS"
 echo
 
-# --------- 2) Build consensus per class (letter) ----------
+# --------- 2) Build consensus per class (letter, original) ----------
+#shopt -s nullglob
+#for d in "$out_lists"/*; do
+#  [[ -d "$d" ]] || continue
+#  dirbase="$(basename "$d")"           # e.g., chr1_..._10000
+#  outbin="$cons_dir/$dirbase"
+#  mkdir -p "$outbin"
+#
+#  for file in "$d"/*.fa; do
+#    [[ -e "$file" ]] || continue
+#    base="$(basename "$file" .fa)"     # e.g., chr1_..._10000_B_0.92
+#    aln="$outbin/${base}_clust.fasta"
+#    consout="$outbin/${base}.clust_CONS.fa"
+#
+#    nseq=$(grep -c '^>' "$file" || true)
+#    if [[ "${nseq:-0}" -lt "$MINSEQ" ]]; then
+#      echo "WARN: <$file> has <$nseq> sequences; skipping consensus." >&2
+#      continue
+#    fi
+#
+#    [[ -s "$aln" ]] || clustalo -i "$file" -o "$aln" --force --threads "$THREADS"
+#
+#    # Header = exact basename (no prefixing)
+#    label="$base"
+#    [[ -s "$consout" ]] || cons -sequence "$aln" -name "$label" -outseq "$consout"
+#  done
+#done
+
+# --------- 2) Build consensus per class (letter, change 1) ----------
+#shopt -s nullglob
+#for d in "$out_lists"/*; do
+#  [[ -d "$d" ]] || continue
+#  dirbase="$(basename "$d")"            # e.g., chr1_..._10000
+#  chr_prefix="${dirbase%%_*}"           # "chr1" from "chr1_..."
+#
+#  # --- keep only requested chromosomes ---
+#  keep=0
+#  for want in "${CHR_ARR[@]}"; do
+#    want_strip="${want//[[:space:]]/}"  # be robust to stray spaces
+#    if [[ "$chr_prefix" == "$want_strip" ]]; then
+#      keep=1
+#      break
+#    fi
+#  done
+#  [[ $keep -eq 1 ]] || continue
+#
+#  outbin="$cons_dir/$dirbase"
+#  mkdir -p "$outbin"
+#
+#  for file in "$d"/*.fa; do
+#    [[ -e "$file" ]] || continue
+#    base="$(basename "$file" .fa)"     # e.g., chr1_..._10000_B_0.92
+#    aln="$outbin/${base}_clust.fasta"
+#    consout="$outbin/${base}.clust_CONS.fa"
+#
+#    nseq=$(grep -c '^>' "$file" || true)
+#    if [[ "${nseq:-0}" -lt "$MINSEQ" ]]; then
+#      echo "WARN: <$file> has <$nseq> sequences; skipping consensus." >&2
+#      continue
+#    fi
+#
+#    [[ -s "$aln"     ]] || clustalo -i "$file" -o "$aln" --force --threads "$THREADS"
+#    [[ -s "$consout" ]] || cons -sequence "$aln" -name "$base" -outseq "$consout"
+#  done
+#done
+
+# --------- 2) Build consensus per class (letter, change2) ----------
 shopt -s nullglob
-for d in "$out_lists"/*; do
-  [[ -d "$d" ]] || continue
-  dirbase="$(basename "$d")"           # e.g., chr1_..._10000
+
+# Select directories only for specified chromosomes
+chr_dirs=()
+for chr in "${CHR_ARR[@]}"; do
+  # Trim spaces and find all dirs beginning with chr_
+  chr_clean="${chr//[[:space:]]/}"
+  for d in "$OUTDIR/group_HOR_monomers_output/${chr_clean}_"*; do
+    [[ -d "$d" ]] && chr_dirs+=("$d")
+  done
+done
+
+if [[ ${#chr_dirs[@]} -eq 0 ]]; then
+  echo "ERROR: No directories found matching requested chromosomes under $OUTDIR/group_HOR_monomers_output"
+  exit 3
+fi
+
+for d in "${chr_dirs[@]}"; do
+  dirbase="$(basename "$d")"            # e.g., chr1_14389697_14926924_14599767_14619767
+  chr_prefix="${dirbase%%_*}"           # "chr1"
+  echo "[*] Processing: $dirbase ($chr_prefix)"
   outbin="$cons_dir/$dirbase"
   mkdir -p "$outbin"
 
   for file in "$d"/*.fa; do
     [[ -e "$file" ]] || continue
-    base="$(basename "$file" .fa)"     # e.g., chr1_..._10000_B_0.92
+    base="$(basename "$file" .fa)"
     aln="$outbin/${base}_clust.fasta"
     consout="$outbin/${base}.clust_CONS.fa"
 
@@ -190,14 +273,10 @@ for d in "$out_lists"/*; do
       continue
     fi
 
-    [[ -s "$aln" ]] || clustalo -i "$file" -o "$aln" --force --threads "$THREADS"
-
-    # Header = exact basename (no prefixing)
-    label="$base"
-    [[ -s "$consout" ]] || cons -sequence "$aln" -name "$label" -outseq "$consout"
+    [[ -s "$aln"     ]] || clustalo -i "$file" -o "$aln" --force --threads "$THREADS"
+    [[ -s "$consout" ]] || cons -sequence "$aln" -name "$base" -outseq "$consout"
   done
 done
-
 # --------- 3) Concatenate consensus per chromosome ----------
 for chr in "${CHR_ARR[@]}"; do
   outfa="$all_cons_dir/${chr}_clust.cons.fa"

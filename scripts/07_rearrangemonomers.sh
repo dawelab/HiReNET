@@ -226,7 +226,7 @@ echo "[*] Building per-bin lists and merged FASTAs …"
 while read -r chr array_start array_end bin_start bin_end; do
   monolist="$OUTDIR/chr_list/${chr}_monomer_list.txt"
   listout="$OUTDIR/mergebin_list/${chr}_${array_start}_${array_end}_${bin_start}_${bin_end}.list.txt"
-  [[ -s "$monolist" ]] || { echo "[!] Missing $monolist — skipping bin" >&2; continue; }
+  [[ -s "$monolist" ]] || continue
 
   # pick monomers whose genomic start falls in [bin_start, bin_end)
   awk -v C="$chr" -v S="$bin_start" -v E="$bin_end" \

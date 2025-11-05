@@ -1,20 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # --- find the HiReNET folder, but don't change working directory ---
-# --- find the HiReNET folder, but don't change working directory ---
 if [[ -n "${HIRENET_ROOT:-}" && -d "${HIRENET_ROOT}" ]]; then
-  ROOT="${HIRENET_ROOT}"
-else
-  ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-fi
-export HIRENET_ROOT="${ROOT}"
-# stay in the user’s working directory
-  ROOT="${HIRENET_ROOT}"
-else
-  ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-fi
-export HIRENET_ROOT="${ROOT}"
-# stay in the user’s working directory
   ROOT="${HIRENET_ROOT}"
 else
   ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

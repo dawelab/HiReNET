@@ -8,43 +8,31 @@ else
   ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 fi
 export HIRENET_ROOT="${ROOT}"
-# ==============================================================
-# HiReNET: monomerfind.sh  (Linux version)
-# --------------------------------------------------------------
-# Purpose:
-#   Detect and extract individual monomers within tandem repeat
-#   arrays identified by arrayfind. Runs nhmmer using the provided
-#   profile HMM, converts array-relative hits to chromosome 
-#   coordinates, and outputs per-chromosome monomer FASTAs.
+
+# ======================================
+# monomerfind.sh  (arrays-only → genomic BED/FASTA extraction) [Linux]
+# Run nhmmer on precomputed array FASTAs to extract monomers (array coords),
+# convert to chromosome coords using the array header, and extract monomers
+# from chromosome FASTAs.
 #
-# Dependencies:
-#   - nhmmer (HMMER)
-#   - seqkit
-#   - bedtools
+# Inputs:
+#   --arrays-dir  : <chr>_<PREFIX>_array.fa  (from arrayfind.sh)
+#   --chrom-dir   : per-chrom FASTAs (chr1.fasta|chr1.fa, etc.)
 #
-# Input:
-#   - Array FASTA files from HiReNET arrayfind output
-#   - Chromosome FASTAs for coordinate mapping
-#   - Profile HMM model (from HiReNET getphmm)
+# Outputs (under --outdir):
+#   <chr>_<PREFIX>_array_hmmoutF.*                     (nhmmer outputs)
+#   <chr>_<PREFIX>_array_monomer*.fa                   (raw/filt/renamed from ARRAYS)   [kept]
+#   <chr>_<PREFIX>_array_monomer_filt.format.fa.split/*.fa (one file per monomer)       [kept]
+#   NEW:
+#     <chr>_<PREFIX>_array_hmmoutF.out.genomic.bed     (monomers in CHR coords)
+#     <chr>_<PREFIX>_monomer_genomic.fa                (monomers extracted from CHR)
+#     <chr>_<PREFIX>_monomer_genomic_filt.fa
+#     <chr>_<PREFIX>_monomer_genomic_filt.format.fa
+#     <chr>_<PREFIX>_monomer_genomic_filt.format.fa.split/*.fa
+#     <PREFIX>_monomers/*.fa                           (flat dir of per-monomer FASTAs; genomic)
 #
-# Output:
-#   - Monomer hit tables (per chromosome)
-#   - Extracted monomer FASTAs (per chromosome)
-#
-# Example:
-#   HiReNET monomerfind \
-#       --arrays-dir AthCEN178_arrayout \
-#       --chrom-dir  AthCEN178_arrayout/split_seq \
-#       --outdir     AthCEN178_monomerout \
-#       --prefix     AthCEN178 \
-#       --hmm        AthCEN178_phmm/AthCEN178.hmm \
-#       --chr "chr1,chr2,chr3,chr4,chr5"
-#
-# Notes:
-#   - Automatically converts relative monomer coordinates to genomic
-#     positions using array headers (chr:start-end format).
-#   - Works with single or multiple chromosomes.
-# ==============================================================
+# Requires in PATH (Linux/CentOS): nhmmer, makehmmerdb, bedtools, bioawk, awk, sed, xargs
+# ======================================
 
 # ---------- defaults ----------
 ARRAYS_DIR=""
@@ -55,65 +43,31 @@ HMMFILE=""
 MIN_MONOMER_LEN=120
 CHR_CSV=""
 CHR_FILE=""
+
 # ---------- helpers ----------
 die()  { echo "ERROR: $*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "Missing dependency: $1"; }
 
-# ---- usage / help ----
-usage() {
+print_help() {
   cat <<'EOF'
-============================================================
-                     HiReNET: monomerfind
-============================================================
-
-Description:
-  Detect individual monomers within tandem repeat arrays by 
-  scanning with a profile HMM. Converts array-relative hits 
-  into chromosome coordinates and extracts corresponding sequences.
-
-------------------------------------------------------------
 Usage:
-  HiReNET monomerfind \
-      --arrays-dir <path/to/arrays> \
-      --chrom-dir  <path/to/chrom_fastas> \
-      --outdir     <path/to/output_dir> \
-      --prefix     <prefix> \
-      --hmm        <model.hmm> [options]
+  ./monomerfind.sh \
+    --arrays-dir /path/to/arrays \
+    --chrom-dir  /path/to/chrom_fastas \
+    --outdir     /path/to/out \
+    --prefix     CEN178 \
+    --hmm        model.hmm \
+    [--min-monomer-len 120] \
+    [--chr "chr1,chr2,..."] \
+    [--chr-file chr_list.txt]
 
-Required arguments:
-  --arrays-dir <dir>       Directory of array FASTAs (from arrayfind)
-  --chrom-dir  <dir>       Directory of chromosome FASTAs
-  --outdir     <dir>       Output directory (created if missing)
-  --prefix     <name>      Prefix for output files
-  --hmm        <file>      Profile HMM (from getphmm output)
-
-Optional arguments:
-  --min-monomer-len <int>  Minimum monomer length to keep (default: 120)
-  --chr "chr1,chr2,..."    Comma-separated chromosome names
-  --chr-file <file>        File containing chromosome list (one per line)
-  -h, --help               Show this help message and exit
-
-------------------------------------------------------------
 Notes:
-  • nhmmer runs against array FASTAs to detect repeat monomers.
-  • Coordinates are lifted to genome scale using array headers.
-  • Monomer FASTAs are extracted per chromosome using seqkit.
-
-Example:
-  HiReNET monomerfind \
-      --arrays-dir AthCEN178_arrayout \
-      --chrom-dir  AthCEN178_arrayout/split_seq \
-      --outdir     AthCEN178_monomerout \
-      --prefix     AthCEN178 \
-      --hmm        AthCEN178_phmm/AthCEN178.hmm \
-      --chr "chr1,chr2,chr3,chr4,chr5"
-
-============================================================
+  - nhmmer runs on array FASTAs, as before.
+  - We parse array headers like "chr1:134639433-134981594" and lift array-relative
+    monomer hits into chromosome coordinates (gStart = arrayStart + relStart, etc.).
+  - Monomer FASTAs are then extracted from chromosome FASTAs.
 EOF
 }
-
-# Backward compatibility (in case older code still calls print_help)
-print_help() { usage; }
 
 # ---------- parse args ----------
 [[ $# -eq 0 ]] && { print_help; exit 1; }
@@ -166,12 +120,18 @@ if [[ -n "$CHR_FILE" ]]; then
 elif [[ -n "$CHR_CSV" ]]; then
   IFS=',' read -r -a CHRS <<< "$CHR_CSV"
 else
-  mapfile -t CHRS < <(ls "$ARRAYS_DIR"/*_"$PREFIX"_array.fa 2>/dev/null \
-                      | xargs -n1 basename \
-                      | sed -E "s/_${PREFIX}_array\.fa$//" )
+  shopt -s nullglob
+  arr_files=( "$ARRAYS_DIR"/*_"$PREFIX"_array.fa )
+  if (( ${#arr_files[@]} == 0 )); then
+    die "No array FASTAs matching '*_${PREFIX}_array.fa' in $ARRAYS_DIR"
+  fi
+  CHRS=()
+  for f in "${arr_files[@]}"; do
+    b="$(basename "$f")"
+    CHRS+=( "${b%%_*}" )
+  done
 fi
-[[ ${#CHRS[@]} -eq 0 ]] && die "No array FASTAs found for prefix '$PREFIX' in $ARRAYS_DIR"
-
+[[ ${#CHRS[@]} -eq 0 ]] && die "Chromosome list is empty after detection."
 echo "[*] Arrays for: ${CHRS[*]}"
 
 # ---------- helper: find chr fasta path ----------

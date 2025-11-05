@@ -193,17 +193,17 @@ echo
 
 # ---------- Run multi-chr workflow (always *_all.R) ----------
 echo "[*] S6_HOR_newpatt_all.R ..."
-Rscript R/S6_HOR_newpatt_all.R \
+Rscript ${HIRENET_ROOT}/R/S6_HOR_newpatt_all.R \
   --input "$DATADIR" \
   --outdir "$OUTDIR"
 
 echo "[*] S7_HOR_shared_pattern.R ..."
-Rscript R/S7_HOR_shared_pattern.R \
+Rscript ${HIRENET_ROOT}/R/S7_HOR_shared_pattern.R \
   --outdir "$OUTDIR" \
   --letters "$LETTERDIR"
 
 echo "[*] S8_Shared_HOR_plot_cus_all.R ..."
-Rscript R/S8_Shared_HOR_plot_cus_all.R \
+Rscript ${HIRENET_ROOT}/R/S8_Shared_HOR_plot_cus_all.R \
   --input "$DATADIR" \
   --outdir "$OUTDIR"
 
