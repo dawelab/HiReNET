@@ -1,3 +1,5 @@
+![Uploading A_vector-based_digital_graphic_logo_for_HiReNET_is.png…]()
+
 # HiReNET – Higher-order Repeat Network Exploration Tool
 
 ## Introduction:
