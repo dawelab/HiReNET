@@ -64,15 +64,15 @@ HiReNET runALL \
   --prefix test \
   --consensus data/AthCEN178_consensus.fasta \
   --seq data/test.fasta \
-  --variant AthCEN178_consensus_variant.fasta
+  --variant data/AthCEN178_consensus_variant.fasta
 	
 # Run for mutiple chromosomes or sequences. Ey15.fasta is Arabidopsis genome sequences from https://doi.org/10.1038/s41586-023-06062-z.
 HiReNET runALL \
   --chr chr1,chr2,chr3,chr4,chr5 \
   --prefix AthCEN178 \
-  --consensus AthCEN178_consensus.fasta \
+  --consensus data/AthCEN178_consensus.fasta \
   --seq Ey15.fasta \
-  --variant AthCEN178_consensus_variant.fasta	
+  --variant data/AthCEN178_consensus_variant.fasta	
 </pre>
 ## Docs
 Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki/HiReNET-wiki) for detailed documentation.
