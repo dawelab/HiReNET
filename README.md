@@ -23,28 +23,35 @@ HiReNET --help
 </pre>
 ## Dependencies:
 HiReNET relies on common bioinformatics tools. Please make sure these are installed and available in your PATH:
-- HMMER (3.4)
-- BLAST+ (2.16.0)
-- BLAT (3.7)
-- SeqKit (2.9.0)
-- BEDTools (2.31.1)
-- bioawk (1.0)
-- MAFFT (7.526)
-- Clustal-Omega (1.2.4)
-- EMBOSS (6.6.0)
+<table>
+<tr><th>Bioinformatics Tools</th><th>R Packages</th></tr>
+<tr><td>
 
-R with packages:
-- dplyr
-- tidyr
-- stringr
-- purrr
-- rlang
-- data.table
-- ggplot2
-- cowplot
-- igraph
-- caret
-- readr
+- HMMER (3.4)  
+- BLAST+ (2.16.0)  
+- BLAT (3.7)  
+- SeqKit (2.9.0)  
+- BEDTools (2.31.1)  
+- bioawk (1.0)  
+- MAFFT (7.526)  
+- Clustal-Omega (1.2.4)  
+- EMBOSS (6.6.0)  
+
+</td><td>
+
+- dplyr  
+- tidyr  
+- stringr  
+- purrr  
+- rlang  
+- data.table  
+- ggplot2  
+- cowplot  
+- igraph  
+- caret  
+- readr  
+
+</td></tr> </table>
 
 ## Quick Start:
 <pre>
