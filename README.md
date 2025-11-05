@@ -75,5 +75,5 @@ HiReNET runALL \
 	
 </pre>
 ## Docs
-Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki) for detailed documentation.
+Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki/HiReNET-wiki) for detailed documentation.
 ## Citation
