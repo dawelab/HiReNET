@@ -63,5 +63,5 @@ HiReNET runALL \
 	
 </pre>
 ## Usage
-see [wiki](https://github.com/dawelab/HiReNET/wiki)
+Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki) for detailed documentation.
 ## Citation
