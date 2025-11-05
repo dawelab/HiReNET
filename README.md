@@ -62,7 +62,8 @@ HiReNET runALL \
   --variant AthCEN178_consensus_variant.fasta
 	
 </pre>
-## Usage, see wiki https://github.com/dawelab/HiReNET/wiki
+## Usage
+see wiki https://github.com/dawelab/HiReNET/wiki
 ### Part 1: Prepare profile hidden Markov models (phmm’s) for repeat monomer identification. 
 Before starting this pipeline, whole-genome sequencing short reads should be analyzed with RepeatExplorer TAREAN to generate consensus repeats and repeat variants for each repeat type. RepeatExplorer is available through the public Galaxy server at https://repeatexplorer-elixir.cerit-sc.cz/. Using the outputs from RepeatExplorer TAREAN, you can then select the repeat of interest and generate profile hidden Markov models (pHMMs). 
 
