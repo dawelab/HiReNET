@@ -62,6 +62,6 @@ HiReNET runALL \
   --variant AthCEN178_consensus_variant.fasta
 	
 </pre>
-## Usage
+## Docs
 Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki) for detailed documentation.
 ## Citation
