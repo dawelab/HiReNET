@@ -189,6 +189,9 @@ IFS=',' read -ra CHRS <<< "$CHR_CSV"
 for chr in "${CHRS[@]}"; do
   chr="$(echo "$chr" | xargs)"  # trim
   [[ -n "$chr" ]] || continue
+  
+ml Clustal-Omega/1.2.4-GCC-12.3.0
+ml EMBOSS/6.6.0-foss-2023a
 
   HiReNET consensusHORmonomer \
     --outdir "$ARR_HOR_DIR" \
