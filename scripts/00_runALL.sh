@@ -109,19 +109,19 @@ ARR_HOR_DIR="${PREFIX}_network_mergebin_consensus"
 
 # ---------- pipeline ----------
 echo "=== Step 1 — getphmm ==="
-#ml MAFFT/7.526-GCC-13.3.0-with-extensions
+ml MAFFT/7.526-GCC-13.3.0-with-extensions
 ml HMMER/3.4-gompi-2023b
-#HiReNET getphmm -i "$VARIANT" -o "$PHMM_DIR" -p "$PREFIX"
+HiReNET getphmm -i "$VARIANT" -o "$PHMM_DIR" -p "$PREFIX"
 
 echo "=== Step 2 — arrayfind ==="
 ml BEDTools/2.31.1-GCC-13.3.0
 ml BLAST+/2.16.0-gompi-2024a
-#ml SeqKit/2.9.0
-#HiReNET arrayfind -g "$GENOME" -c "$CONSENSUS" -o "$ARRAY_DIR" -p "$PREFIX"
+ml SeqKit/2.9.0
+HiReNET arrayfind -g "$GENOME" -c "$CONSENSUS" -o "$ARRAY_DIR" -p "$PREFIX"
 
 echo "=== Step 3 — monomerfind ==="
 ml HMMER/3.4-gompi-2023b
-#ml BEDTools/2.31.1-GCC-13.3.0
+ml BEDTools/2.31.1-GCC-13.3.0
 ml bioawk/1.0-GCC-12.3.0
 HiReNET monomerfind \
   --arrays-dir "$ARRAY_DIR" \
