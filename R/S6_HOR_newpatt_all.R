@@ -224,4 +224,4 @@ for (file in data_files) {
   message("  - done: ", bx, " (thr=", thr_int, ")")
 }
 
-message("[✓] S1_HOR_newpatt_all.R finished.")
+message("[✓] S6_HOR_newpatt_all.R finished.")
