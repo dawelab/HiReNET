@@ -55,6 +55,31 @@ HiReNET relies on common bioinformatics tools. Please make sure these are instal
 </td></tr>
 </table>
 
+## Input Data:
+Input sequences must be provided in FASTA format, with each sequence written on a single line. Chromosome names should use chr1, chr2, chr3, rather than chr01, chr02, chr03. If the provided sequences are not derived directly from a genome assembly, name them sequentially as seq1, seq2, seq3.
+<pre>
+	>chr1
+	CCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCT
+	>chr2
+	AGTAATTCTAGAGCTAATACGTGCAACAAACCCCGACTTATGGAAGGGACGCATTTATTA
+	...
+	>chr10
+	CCCTAAACCCTAAACCCTAAACCTAAACCCTAACTAAACCCTAAACCCTAAACCCTAAAC
+	>chr11
+	GGATCCGTGGTTTCGCGTATCGGCATGGTCGGGAGCTTTTATCTCGGTCTTGTCGTGCGC
+	...
+	or 
+	>seq1
+	CCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCTAAACCCT
+	>seq2
+	AGTAATTCTAGAGCTAATACGTGCAACAAACCCCGACTTATGGAAGGGACGCATTTATTA
+	...
+	>seq10
+	CCCTAAACCCTAAACCCTAAACCTAAACCCTAACTAAACCCTAAACCCTAAACCCTAAAC
+	>seq11
+	GGATCCGTGGTTTCGCGTATCGGCATGGTCGGGAGCTTTTATCTCGGTCTTGTCGTGCGC
+	...
+</pre>
 ## Quick Start:
 <pre>
 # Run for a single chromosome or sequence. 
