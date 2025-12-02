@@ -1,5 +1,5 @@
 <p align="center">
-	[Logo_v2.pdf](https://github.com/user-attachments/files/23887799/Logo_v2.pdf)
+<img width="1989" height="1824" alt="logo_v2" src="https://github.com/user-attachments/assets/e736dbe9-d1b7-454f-871b-13f51ec4131c" />
 
 </p>
 
