@@ -1,5 +1,5 @@
 <p align="center">
-[Logo_v2.pdf](https://github.com/user-attachments/files/23887789/Logo_v2.pdf)
+	[Logo_v2.pdf](https://github.com/user-attachments/files/23887799/Logo_v2.pdf)
 
 </p>
 
