@@ -1,5 +1,6 @@
 <p align="center">
-	<img width="512" height="512" alt="logo_HiReNET" src="https://github.com/user-attachments/assets/9dd27565-f7da-42f9-b6ee-372aca13c150" />
+[Logo_v2.pdf](https://github.com/user-attachments/files/23887789/Logo_v2.pdf)
+
 </p>
 
 # HiReNET – Higher-order Repeat Network Exploration Tool
