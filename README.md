@@ -102,6 +102,6 @@ HiReNET runALL \
 ## Docs
 Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki/HiReNET-wiki) for detailed documentation.
 ## Citation
-Higher order repeat structures reflect diverging evolutionary paths in maize centromeres and knobs
-Rebecca D. Piri, M. Cinta Romay, Edward S. Buckler, R. Kelly Dawe
-bioRxiv 2025.01.31.635908; doi: https://doi.org/10.1101/2025.01.31.635908
+If you use this software in academic work, please cite: Piri RD, Wang M, Romay CM, 
+Buckler ES, Dawe RK. Higher order repeat structures reflect diverging evolutionary 
+paths in maize centromeres and knobs. Genome Biology.
