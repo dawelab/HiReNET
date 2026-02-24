@@ -103,4 +103,5 @@ HiReNET runALL \
 Please see the [Wiki](https://github.com/dawelab/HiReNET/wiki/HiReNET-wiki) for detailed documentation.
 ## Citation
 If you use this software in academic work, please cite: 
+
 Piri, R.D., Wang, M., Romay, M.C. et al. Higher order repeat structures reflect diverging evolutionary paths in maize centromeres and knobs. Genome Biol (2026). https://doi.org/10.1186/s13059-026-03993-4
